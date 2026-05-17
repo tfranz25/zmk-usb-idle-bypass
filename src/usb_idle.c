@@ -5,7 +5,12 @@
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
+
+#if IS_ENABLED(CONFIG_ZMK_RGB_PLUS)
+#include <zmk_rgb_plus.h>
+#elif IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
 #include <zmk/rgb_underglow.h>
+#endif
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -28,15 +33,37 @@ static int handle_idle_state(bool target_wake_state) {
 
     if (sleep_state.is_awake) {
         if (sleep_state.rgb_state_before_sleeping) {
+#if IS_ENABLED(CONFIG_ZMK_RGB_PLUS)
+            return zmk_rgb_plus_on();
+#elif IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
             return zmk_rgb_underglow_on();
+#else
+            return 0;
+#endif
         } else {
+#if IS_ENABLED(CONFIG_ZMK_RGB_PLUS)
+            return zmk_rgb_plus_off();
+#elif IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
             return zmk_rgb_underglow_off();
+#else
+            return 0;
+#endif
         }
     } else {
         bool current_rgb_state = false;
+#if IS_ENABLED(CONFIG_ZMK_RGB_PLUS)
+        zmk_rgb_plus_get_state(&current_rgb_state);
+#elif IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
         zmk_rgb_underglow_get_state(&current_rgb_state);
+#endif
         sleep_state.rgb_state_before_sleeping = current_rgb_state;
+#if IS_ENABLED(CONFIG_ZMK_RGB_PLUS)
+        return zmk_rgb_plus_off();
+#elif IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
         return zmk_rgb_underglow_off();
+#else
+        return 0;
+#endif
     }
 }
 
