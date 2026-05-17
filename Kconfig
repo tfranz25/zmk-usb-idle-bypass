@@ -1,0 +1,7 @@
+config ZMK_BT_IDLE_ONLY
+    bool "Turn off RGB underglow only when idling on Bluetooth (not USB)"
+    default n
+    help
+      If enabled, this intercepts the ZMK idle state. If the keyboard
+      is connected via USB, the RGB underglow will stay on. If it is
+      running on battery (Bluetooth), the RGB underglow will turn off.

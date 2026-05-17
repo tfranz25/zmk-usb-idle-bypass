@@ -1,0 +1,4 @@
+name: zmk-usb-idle-bypass
+build:
+  cmake: .
+  kconfig: Kconfig
